@@ -10,8 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - name: Cleanup Server Disk
-      uses: acmsh/cleanup-action@v3
     - name: Install Build Tools
       run: |
         sudo apt update
