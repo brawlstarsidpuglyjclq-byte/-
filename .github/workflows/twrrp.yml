@@ -1,0 +1,39 @@
+name: Build TWRP for Android 16
+on:
+  workflow_dispatch:
+env:
+  MANIFEST_URL: "https://github.com"
+  MANIFEST_BRANCH: "twrp-12.1"
+  DEVICE_CHOICE: "omni_k65v1_64_bsp-eng"
+  DEVICE_PATH: "device/alps/k65v1_64_bsp"
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Install Build Tools
+      run: |
+        sudo apt update
+        sudo apt install gawk git gnupg flex bison gperf build-essential zip curl zlib1g-dev liblz4-tool libssl-dev gcc-multilib g++-multilib libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip python3 rsync python-is-python3 -y
+    - name: Initialize Repo and Sync Source
+      run: |
+        mkdir ~/bin
+        curl https://githubusercontent.com > ~/bin/repo
+        chmod a+x ~/bin/repo
+        export PATH=~/bin:$PATH
+        mkdir twrp && cd twrp
+        repo init -u ${{ env.MANIFEST_URL }} -b ${{ env.MANIFEST_BRANCH }} --depth=1
+        repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags
+    - name: Clone Device Tree
+      run: |
+        git clone https://github.com{{ github.repository }}.git twrp/${{ env.DEVICE_PATH }}
+    - name: Compile Recovery Image
+      run: |
+        cd twrp
+        . build/envsetup.sh
+        lunch ${{ env.DEVICE_CHOICE }}
+        mka recoveryimage -j$(nproc)
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TWRP_Android16_k65v1_64_bsp
+        path: twrp/out/target/product/k65v1_64_bsp/recovery.img
