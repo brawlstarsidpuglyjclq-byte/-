@@ -2,7 +2,7 @@ name: Build TWRP for Android 16
 on:
   workflow_dispatch:
 env:
-  MANIFEST_URL: "https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git"
+  MANIFEST_URL: "https://github.com"
   MANIFEST_BRANCH: "twrp-12.1"
   DEVICE_CHOICE: "omni_k65v1_64_bsp-eng"
   DEVICE_PATH: "device/alps/k65v1_64_bsp"
